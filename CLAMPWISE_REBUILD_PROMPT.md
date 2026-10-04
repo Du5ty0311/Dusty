@@ -254,6 +254,32 @@ export it without a tour, and without hunting through crowded panels.
     for and what to do ("No recordings yet. Open a file or a folder, or try
     the demo data"), with the button to do it.
 
+*The model: Claude's interface.* I want the app to feel like Claude's app
+(claude.ai): calm, uncluttered, trustworthy, with the content in front and
+the controls out of the way. Borrow the *style*, not the brand: no Anthropic
+or Claude names, logos or licensed fonts. What that means here:
+- a warm off-white background (and a warm dark grey in the dark theme), not
+  pure white or grey-blue; panels separated by space and hairline borders,
+  not boxes and bevels;
+- one warm accent colour (a muted terracotta or clay) used sparingly, for the
+  primary action, selection and focus only;
+- generous whitespace, content in a comfortable reading width, soft rounded
+  corners (about 6-8 px) on panels, buttons and inputs, no gradients;
+- a slim, collapsible left sidebar for navigation and recent projects, like
+  Claude's conversation list; the main area holds one thing at a time;
+- clear type: a clean sans-serif for the interface, readable sizes, numbers
+  aligned in tables;
+- quiet motion only where it helps (a panel sliding open), never animation
+  that delays work;
+- plots styled to match: the same background, thin axis lines, the accent and
+  the colour-blind-safe palette for data, labels in the interface font, so a
+  graph looks like part of the page rather than a pasted-in widget.
+Reliability comes before looks: rendering must never slow analysis or
+scrolling (B1's 0.2 s limit), and every visual choice lives in
+`app/theme.py`. PyQt5 can do all of this with a stylesheet, a custom
+sidebar widget and pyqtgraph theming; say where Qt can't match it (e.g.
+soft shadows are costly) and choose the simpler option.
+
 *Look: quiet, consistent, readable.*
 11. **One spacing scale** (4, 8, 16, 24, 32 px) and one alignment grid;
     labels left-aligned above or beside their control, the same way on every
