@@ -1,4 +1,4 @@
-# Synaptoscope: the rebuild prompt, in sections (written 2026-10-04)
+# Clampwise: the rebuild prompt, in sections (written 2026-10-04)
 
 ## How to use this file
 
@@ -14,6 +14,10 @@ or in pieces:
 - **Whenever the change touches a screen** (almost always), also paste
   **B0** (the interface: layout, look and navigation). It is the rulebook every
   screen follows.
+- **Whenever the change touches how data are stored, loaded, cached or
+  batched, or adds an analysis**, also paste **B18** (foundations for scale)
+  and **B21** (shared fitting and signal tools).
+- **B17** (the rename) is a one-time job: drop it once it is done.
 - **To add your own change to a section:** write it under that section's
   **Your changes** heading, in your own words. Anything there overrides the
   section's text above it.
@@ -31,15 +35,18 @@ for this file: the session must read them before citing them in the app.
 
 ---
 
-# Part A. What Synaptoscope is (always include)
+# Part A. What Clampwise is (always include)
 
-I'm Daniel. Synaptoscope is my desktop app for analyzing slice
-electrophysiology: whole-cell patch clamp (current and voltage clamp) and
-extracellular field recordings, from Axon `.abf` files (Clampex) and WinLTP
-files. It replaces doing these analyses by hand in Clampfit and Excel. The
+I'm Daniel. **Clampwise** (called Synaptoscope until October 2026) is my
+desktop app for analyzing slice electrophysiology: whole-cell patch clamp
+(current and voltage clamp) and extracellular field recordings, from Axon
+`.abf` files (Clampex) and WinLTP files. It replaces doing these analyses by
+hand in Clampfit and Excel, and helps at the rig while I patch. The
 repository is `C:\Users\Daniel Mercado\synaptoscope` (branch `v3`); the
 current code is a working reference for every section below, so read it
-before rewriting it, and keep what already works.
+before rewriting it, and keep what already works. The repository folder, the
+conda environment and the vault folder keep the old name until I move them
+(B17); the paths in this prompt are the real ones.
 
 ## Read first
 
@@ -54,6 +61,70 @@ before rewriting it, and keep what already works.
    window stands for a recording, with its source).
 3. `docs/development/UI_GUIDE.md` (the interface rules from B0, with
    screenshots), once it exists.
+4. The reference library below: the chapters listed for the section you are
+   working on.
+
+## Reference library (the books and papers the app is built on)
+
+The app's methods come from these. I confirmed that each one exists and its
+publication details; the contents listed are what each is known for, not a
+re-read, so **read the chapter before building from it or citing it in the
+app**, and cite chapter or page in the manual. Don't copy text from the books
+into the app; explain in our own words and cite. If a book is not available
+to you, say so and work from the method papers it cites. Where a book and a
+recorded decision disagree, show me both.
+
+*Patch-clamp practice*
+
+| Source | What the app takes from it | Sections |
+|---|---|---|
+| Sakmann & Neher (eds) 1995, *Single-Channel Recording*, 2nd ed (Plenum; Springer reprint) | Marty & Neher on whole-cell recording; Sigworth on the amplifier and series-resistance compensation; Gillis on capacitance measurement; Colquhoun & Sigworth on fitting and the statistics of records | B19, B20, B21 |
+| Walz (ed) 2007, *Patch-Clamp Analysis: Advanced Techniques*, 2nd ed, Neuromethods 38 (Humana) | whole-cell and perforated-patch recording, fast drug application, the analysis of each | B19, B20 |
+| Molleman 2003, *Patch Clamping: An Introductory Guide to Patch Clamp Electrophysiology* (Wiley) *(verify)* | plain explanations of the seal, membrane test and recording modes, for the manual | B15, B19 |
+| *The Axon Guide* (Molecular Devices) *(verify the edition)* | membrane test, Rs compensation and its errors, leak subtraction, filtering and sampling, liquid junction potential | B8, B19, B20, B21 |
+
+*Cellular biophysics and neural computation*
+
+| Source | What the app takes from it | Sections |
+|---|---|---|
+| Johnston & Wu 1995, *Foundations of Cellular Neurophysiology* (MIT Press) | passive membrane and cable properties, space clamp, quantal analysis of transmission | B6, B20, B22 |
+| Hille 2001, *Ion Channels of Excitable Membranes*, 3rd ed (Sinauer) | conductance, reversal potential, Boltzmann activation, GHK | B8 |
+| Koch 1999, *Biophysics of Computation* (Oxford) | dendritic filtering of synaptic inputs, limits of the space clamp, synaptic integration | B20 |
+| Dayan & Abbott 2001, *Theoretical Neuroscience* (MIT Press) | firing rate, interspike-interval statistics, CV, f-I curves | B6, B4 |
+| Gerstner, Kistler, Naud & Paninski 2014, *Neuronal Dynamics* (Cambridge; free online) | adaptation, firing patterns, fitting simple neuron models to recordings | B6 |
+| Izhikevich 2007, *Dynamical Systems in Neuroscience* (MIT Press) | firing-pattern classes (tonic, adapting, bursting, delayed), excitability types and rheobase | B6 |
+
+*Data analysis*
+
+| Source | What the app takes from it | Sections |
+|---|---|---|
+| Kass, Eden & Brown 2014, *Analysis of Neural Data* (Springer) | estimation with uncertainty, the bootstrap, regression, point processes for spike and event trains | B4, B23 |
+| Nylen & Wallisch 2017, *Neural Data Science: A Primer with MATLAB and Python* (Academic Press) | the analysis cascade (import, preprocess, analyze, visualize) as a pipeline; Python practice | B18 |
+| Cohen 2014, *Analyzing Neural Time Series Data* (MIT Press) | filtering, spectra, time-frequency analysis | B9, B21 |
+| Mitra & Bokil 2008, *Observed Brain Dynamics* (Oxford) | multitaper spectra with confidence intervals | B9 |
+| Motulsky & Christopoulos 2004, *Fitting Models to Biological Data Using Linear and Nonlinear Regression* (Oxford) | fitting, weighting, comparing models, confidence intervals of fitted parameters | B21 |
+| Motulsky, *Intuitive Biostatistics* (Oxford) | error bars, paired data, which test (already in B12) | B12, B23 |
+
+*Method papers used by the new sections*
+
+- Neher 1992, *Methods Enzymol* 207:123; Barry 1994, *J Neurosci Methods*
+  51:107 (JPCalc): liquid junction potential (B20).
+- Williams & Mitchell 2008, *Nat Neurosci* 11:790: voltage-clamp errors in
+  central neurons (B20).
+- Golowasch et al. 2009, *J Neurophysiol* 102:2161: capacitance depends on
+  how it is measured in non-isopotential neurons (B20).
+- Traynelis 1998, *J Neurosci Methods* 86:25: offline series-resistance
+  correction *(verify)* (B20).
+- Silver 2003, *J Neurosci Methods* 130:127 (multiple-probability fluctuation
+  analysis); Clements 2003, *J Neurosci Methods* 130:115 (variance-mean
+  analysis) *(verify)*; Saviane & Silver 2006, *J Neurosci Methods* 153:250
+  (errors in the variance) (B22).
+- Sigworth 1980, *J Physiol* 307:97 and Traynelis et al. 1993, *Neuron*
+  11:279: non-stationary and peak-scaled fluctuation analysis *(verify)* (B22).
+- Saravanan, Berman & Sober 2020, *Neurons, Behavior, Data analysis, and
+  Theory* 3(5): the hierarchical bootstrap for nested data (B23).
+- Rübel et al. 2022, *eLife* 11:e78362: Neurodata Without Borders (NWB), the
+  standard format for sharing neurophysiology data (B18).
 
 ## Who uses it and for what
 
@@ -97,13 +168,16 @@ before rewriting it, and keep what already works.
 |---|---|---|
 | Reading files | `io/` | ABF, WinLTP, demo `.npz`; one `Recording` object per file |
 | Recording identity | `core/` | animal / slice / cell / condition, typed or parsed from paths |
+| Project store | `project/` | one experiment's index, settings, review decisions, result cache and provenance (B18) |
+| Shared tools | `analysis/tools/` | filters, baselines, fits, kinetics definitions, used by every analysis (B21) |
 | Analyses | `analysis/` | no Qt; each analysis registers itself for the recording types it applies to (`addons.register`) and returns a result with `cell_measures()`, `result_rows()`, `sweep_rows()` |
 | Exports | `export/` | Excel workbook, tidy CSV with a manifest, publication figures |
 | Stimulus files | `protocol/` | the stimulus designer's model and its Clampex output |
 | Interface | `app/` | PyQt window, Setup pages, Plots, figure builder, manual. **All colours, fonts, sizes and spacing come from one theme module (`app/theme.py`) and one Qt stylesheet built from it; no widget sets its own colour, font or margin.** |
 
 Analyses must be testable without the window, against simulated recordings
-with known answers (`simulate.py`, `tools/audit/known_answers.py`).
+with known answers (`simulate.py`, `tools/audit/known_answers.py`), and
+runnable from the command line with the same numbers as the window (B18).
 
 ---
 
@@ -364,7 +438,11 @@ averaged event (D3). Statistics on cells, not pooled events.
 **Requirements.** Keep what is built: detection over the whole file or a
 chosen stretch, the experiment template, mismatch warnings, events over time,
 event review (accept / reject). Show detection on the trace so the user can
-judge it.
+judge it. Report the timing of events as well as their size: the
+inter-event-interval distribution, its CV, and whether the events look like
+a steady random (Poisson) process or come in bursts (Kass, Eden & Brown;
+Dayan & Abbott), so a frequency change can be told from a change in
+burstiness. Accepted events feed fluctuation analysis (B22).
 
 **Your changes.**
 -
@@ -396,7 +474,20 @@ current-step families.
 
 **The standard.** IPFX (Gouwens et al. 2019, *Nat Neurosci* 22:1182), with the
 recorded departures (steady-state Rin, 10-95% tau window, median over steps).
-Spike detection matches IPFX.
+Spike detection matches IPFX. Firing patterns from Izhikevich 2007 and
+Gerstner et al. 2014; interspike-interval statistics and f-I curves from
+Dayan & Abbott 2001; passive properties from Johnston & Wu 1995.
+
+**Requirements.**
+- Keep what IPFX-style analysis already gives, and add the firing
+  description the books use: f-I curve with its slope (gain) and rheobase;
+  first-spike latency; adaptation index and ISI ratio (last / first); ISI CV;
+  and a firing-pattern label (tonic, adapting, bursting, delayed, stuttering)
+  with the rule that set it printed beside it, never a label alone.
+- Membrane tau and Rin come with the fit shown on the trace and the method
+  named (B21); sag ratio says which step and window it used.
+- Spike shape (threshold, peak, half-width, AHP, max rise and fall rates) per
+  spike and as the first-spike-at-rheobase headline, saying which spike.
 
 **Your changes.**
 -
@@ -437,6 +528,11 @@ Priorities).
 **What it is for.** Power spectra, ripples, gamma and phase-amplitude
 coupling in field recordings; light-pattern (DMD / Polygon) maps of synaptic
 input.
+
+**The standard.** Multitaper spectra with confidence intervals (Mitra &
+Bokil 2008); filtering, time-frequency and phase-amplitude coupling as in
+Cohen 2014. Filters and their settings come from the shared tools (B21) and
+are listed with the result.
 
 **Your changes.**
 -
@@ -641,7 +737,10 @@ measures, the standard and its source, how to read it, common pitfalls); a
 methods guide for figures (B12); a glossary of terms (pulse 1, PPR, sweep,
 epoch, DSI, Rs...); a map of the app's screens and keyboard shortcuts (B0);
 the screenshots regenerated by the build. Every "?" in the app opens the
-matching manual entry.
+matching manual entry. A "Further reading" page lists the reference library
+(Part A) by topic, with what each book is good for, so a new lab member knows
+where to learn the method behind a number. A short "Patching with Clampwise"
+guide walks through a rig session (B19).
 
 **Your changes.**
 -
@@ -650,8 +749,313 @@ matching manual entry.
 
 **What it is for.** A Windows program to copy to the rig PC.
 
-**Requirements.** `packaging/build.ps1` builds `dist/Synaptoscope-windows.zip`,
+**Requirements.** `packaging/build.ps1` builds `dist/Clampwise-windows.zip`,
 runs the tests and a self-test inside the frozen app.
+
+**Your changes.**
+-
+
+## B17. Renaming the app to Clampwise (one-time)
+
+**What it is for.** The app is now called **Clampwise**. Everything a user
+sees, and everything the app writes, should say so, without breaking
+anything made under the old name.
+
+**Requirements.**
+1. **On screen and in the build:** window title, About box, splash screen,
+   manual, README and docs, the executable and `dist/Clampwise-windows.zip`.
+2. **In what the app writes:** the "made with" field of the export manifest,
+   Excel workbook properties and figure metadata say "Clampwise <version>".
+3. **The Python package** is renamed `clampwise`; a small `synaptoscope`
+   package stays behind that imports from `clampwise` and warns once, so my
+   old scripts and notebooks keep running.
+4. **Nothing made before is lost:** saved settings are copied from the old
+   Qt settings name on first start; projects, presets, event templates and
+   session files saved by Synaptoscope still open.
+5. **Don't rename the folders yourself:** the repository folder, the conda
+   environment (`envs\synaptoscope`), `synaptoscope-data` and the vault folder
+   `02 - Synaptoscope` stay as they are. Give me the exact steps to rename
+   them, and which paths in this prompt, the build script and the tools change
+   when I do.
+
+**Done when.** A search for "Synaptoscope" in `app/`, `analysis/`, `export/`
+and the docs finds only the compatibility package, the settings migration and
+"formerly Synaptoscope" in the About box and manual; an old settings file and
+an old project open with nothing missing; the build produces
+`Clampwise-windows.zip`.
+
+**Your changes.**
+-
+
+## B18. Foundations for scale: data, speed, batches and provenance
+
+**What it is for.** Keep the app fast and trustworthy as the data, the lab
+and the list of analyses grow: hundreds of files per experiment, years of
+experiments, new recording types and analyses added without rewriting what
+works, and any number traceable back to the file and settings that made it.
+
+**The standard.** The analysis cascade as a fixed pipeline: import,
+preprocess, analyze, summarize, visualize (Nylen & Wallisch 2017). Neurodata
+Without Borders (Rübel et al. 2022) as the shared format for intracellular
+recordings and their metadata, and the FAIR principles it implements
+(findable, accessible, interoperable, reusable).
+
+**Requirements.**
+1. **One data model.** Recording -> sweeps -> channels, each channel with
+   units, sample rate, clamp mode, gain, and the stimulus (epochs, stimulus
+   times); the recording with its start time, identity (animal, slice, cell,
+   condition) and experiment metadata (age, sex, genotype, internal and
+   external solutions, temperature, junction potential, drugs with on and off
+   times). Every reader fills it; analyses read only it, never a file format.
+2. **Readers behind one interface**, so a new format is one new file in
+   `io/`. List the formats the lab might bring (HEKA `.dat`, Igor, AxoGraph,
+   WinWCP) and ask me which to add; reading many formats through `neo` would
+   be a new dependency, so ask.
+3. **Load lazily.** Headers first, samples only when needed (memory-mapped
+   where the format allows); display decimated by min/max so a 60-min file
+   scrolls smoothly; memory use for a 60-min, 20 kHz file stays under a
+   budget you propose and test.
+4. **One project per experiment.** A project folder holding a SQLite
+   database (Python's built-in `sqlite3`) of recordings, identity, settings,
+   review decisions (accepted and rejected events, overrides, exclusions with
+   their reasons) and an index of results. A lab member who opens my project
+   sees what I see.
+5. **Cache results** keyed by the file's content hash, the analysis settings
+   and the analysis version: changing a setting re-runs only what it affects;
+   reopening a project is near-instant; the cache can be cleared.
+6. **Provenance on every number:** file and hash, analysis name and version,
+   settings, app version and date, carried into Results and every export
+   manifest. Re-running the same inputs gives identical numbers.
+7. **Batches in the background.** Analyze a folder or a whole project in
+   worker processes (standard library `concurrent.futures`), with progress,
+   cancel, and a per-file error that never stops the batch; the window stays
+   responsive throughout.
+8. **Same analyses without the window:** `clampwise analyze <folder>
+   --preset DSI` and a Python API (`clampwise.analyze(...)`) give the same
+   numbers as the window, checked by a test.
+9. **Adding an analysis is one file.** An analysis declares, through
+   `addons.register`, the recording types it applies to, its settings (default,
+   units, one-line help, source), and its outputs with definitions. The window
+   builds the settings panel from that declaration (following B0, with
+   "Advanced" for the rest), so a new analysis needs no interface code. Write
+   `docs/development/ADDING_AN_ANALYSIS.md` with a worked example and a
+   known-answer test template.
+10. **Presets** are named, versioned sets of settings for an experiment type
+    (my DSI preset, LTP, intrinsic properties, paired pulses), stored in the
+    project and printed in exports.
+11. **Share in a standard format.** Export a project to NWB (intracellular
+    recordings with their metadata and results), and import NWB. This needs
+    `pynwb`, a new dependency: ask me first. Until then the tidy CSV with its
+    manifest is the shared format.
+12. **Performance budgets checked by tests** in `tools/audit/`: e.g. headers
+    of 100 files in under 5 s, scrolling under 0.2 s per frame, an evoked-file
+    analysis under 1 s. Propose the numbers from measurements on my files.
+
+**Done when.** A 200-file experiment analyzes in the background with the
+window responsive; reopening the project takes under a tenth of the first
+run; a command-line run on DSI_data matches the window's numbers exactly; a
+toy analysis added as one file appears in the window with its settings panel,
+in Results and in the exports, with no interface code written.
+
+**Your changes.**
+-
+
+## B19. At the rig: analysis while patching
+
+**What it is for.** Help decide during the experiment, not afterwards: is the
+cell healthy, is access holding, did the drug arrive, is the baseline stable,
+keep recording or move on.
+
+**The standard.** The membrane test (Axon Guide; Marty & Neher in Sakmann &
+Neher); the quality limits in B10; the passive measurements in B20.
+
+**Requirements.**
+1. **Rig mode:** a simplified screen (B0, dark theme, large text readable from
+   the rig chair) that watches the Clampex folder and analyzes each file with
+   the experiment's preset as soon as Clampex closes it (gap-free files while
+   they are written).
+2. **The cell at a glance:** Rs, Rm, Cm and holding current (voltage clamp) or
+   resting potential and bridge balance (current clamp), and noise, plotted
+   against time since break-in, with the B10 limits drawn; a badge, not a pop
+   up, when a limit is crossed or Rs changes by more than 20%.
+3. **Stability:** the evoked amplitude or event frequency against time, the
+   baseline window and the drug times marked, and a "baseline stable?" check
+   with the rule and its source shown (propose the rule from the LTP and
+   pharmacology literature; I decide it).
+4. **Quick looks in seconds,** using the same code as the full analysis: I-V
+   from a step file, f-I and rheobase from a current-step file, PPR from a
+   paired-pulse file.
+5. **Notes while recording:** typed, timestamped notes (cell, location, drug
+   on and off, comments) stored in the project and lined up with the files on
+   the cell's clock (B1); drug times feed the plots and the figure builder.
+6. **Never gets in Clampex's way:** files opened read-only, partly written
+   files tolerated, no file locks.
+
+**Done when.** Replaying one of my experiment folders as if live (a tool that
+copies its files in with their original timing), the screen updates within
+2 s of each file, flags a simulated Rs jump, and holds no lock on any file
+(checked on Windows).
+
+**Your changes.**
+-
+
+## B20. Passive properties and recording corrections
+
+**What it is for.** Measure the cell's passive properties and the recording's
+own errors (series resistance, junction potential, space clamp), and say how
+much they could have changed each number.
+
+**The standard.**
+- Membrane test from the capacitive transient of a test pulse: Rs from the
+  transient (peak, or an exponential fit extrapolated to the step), Cm from
+  the charge or the time constant, Rm from the steady state (Axon Guide; Gillis
+  in Sakmann & Neher).
+- Capacitance depends on how it is measured in neurons that are not
+  isopotential (Golowasch et al. 2009).
+- Liquid junction potential from the solutions (Neher 1992; Barry 1994,
+  JPCalc).
+- Voltage error from uncompensated series resistance (I x Rs) and the clamp's
+  time constant (Rs x Cm) (Axon Guide; Sigworth in Sakmann & Neher); offline
+  correction (Traynelis 1998) *(verify)*.
+- Space clamp: distal inputs are filtered and under-clamped in large neurons
+  (Williams & Mitchell 2008; Johnston & Wu; Koch).
+
+**Requirements.**
+1. **Test-pulse analysis on every sweep that has one** (found from the
+   command), per sweep: Rs, Rm, Cm, tau and holding current, the method named,
+   the fit drawn (B21). Feeds B10 and B19.
+2. **Capacitance says how it was measured**; where current-clamp and
+   voltage-clamp estimates both exist, show both.
+3. **Junction potential calculator** from the solutions typed in the project
+   (ion concentrations, generalized Henderson equation as in JPCalc). Voltages
+   are corrected only when the user turns it on, and every exported voltage
+   says whether it was corrected and by how much.
+4. **Series-resistance error for each voltage-clamp measurement:** the
+   estimated voltage error and the clamp time constant (with the compensation
+   typed in, or read from the file when it is recorded there); a flag when the
+   error or the time constant is large enough to matter for that measure
+   (propose limits with sources; I decide them). Offline Rs correction as an
+   option, never the default.
+5. **Bridge balance in current clamp:** detect an instant voltage jump at a
+   step's onset and flag it.
+6. **Space clamp** is explained in the manual and in tooltips on kinetics of
+   voltage-clamped synaptic currents in CA3 pyramidal cells; no automatic
+   correction.
+
+**Done when.** On simulated cells with known Rs, Rm and Cm (`simulate.py`)
+the values come back within 5%; on a lab file they agree with Clampex's
+membrane test within a stated tolerance; the junction potential for my
+internal solution matches JPCalc (I give you JPCalc's number).
+
+**Your changes.**
+-
+
+## B21. Fitting and signal processing: one set of shared tools
+
+**What it is for.** Every analysis filters, takes baselines, averages and
+fits curves. Done once, tested once, and described the same way everywhere,
+the same operation gives the same answer on every screen.
+
+**The standard.** Fitting, weighting, model comparison and parameter
+confidence intervals (Motulsky & Christopoulos 2004); fitting electrical
+records (Colquhoun & Sigworth in Sakmann & Neher); filters and sampling (Axon
+Guide; Cohen 2014).
+
+**Requirements.**
+1. **Filters in one module** (Bessel, Gaussian, Butterworth; low, high,
+   band-pass; optional 60 Hz notch with harmonics): type, order, cutoff and
+   whether zero-phase are listed with every result and export; a warning when
+   a cutoff is at or above the Nyquist frequency or above the acquisition
+   filter; the raw data are never changed.
+2. **Baselines** are named windows drawn on the trace; drift removal
+   (a straight-line fit over a stated window) is optional and stated.
+3. **Fits:** one and two exponentials, Boltzmann, Hill, straight line, and
+   the synaptic waveform (difference of exponentials). Each returns parameters
+   with 95% confidence intervals, residuals, goodness of fit, the fit window,
+   and a flag when the fit failed or a parameter sits on a bound. One versus
+   two exponentials is chosen by an F test or AICc, and the choice is shown.
+   Starting values come from the data. Every fit is drawn over the data.
+4. **Kinetics defined in one place** (rise 10-90% or 20-80%, decay tau,
+   half-width, latency and how onset is found), and the definitions feed the
+   column definitions in `export/definitions.py`.
+5. **Averaging** says what it aligns on (stimulus, event onset, peak or
+   half-rise) and which sweeps or events went in.
+6. Each tool is tested against analytic answers.
+
+**Done when.** No analysis has its own filter or fitting code (a search
+shows it); known-answer tests recover fit parameters within tolerance at the
+noise of real recordings; every Results table lists the filters and fit
+models used.
+
+**Your changes.**
+-
+
+## B22. Quantal and fluctuation analysis
+
+**What it is for.** Find out where a change in synaptic strength happens:
+the number of release sites, the release probability, the size of one
+quantum, and the conductance of single channels, from the variability of
+evoked and spontaneous responses.
+
+**The standard.** Quantal analysis (Johnston & Wu); CV analysis (Faber & Korn
+1991, already in B3); variance-mean / multiple-probability fluctuation
+analysis (Silver 2003; Clements 2003 *(verify)*), with the variance's own error
+(Saviane & Silver 2006); non-stationary and peak-scaled fluctuation analysis
+(Sigworth 1980; Traynelis et al. 1993 *(verify)*).
+
+**Requirements.**
+1. **CV analysis** across conditions: the normalized 1/CV² against mean
+   plot, with a plain guide to reading it and its assumptions.
+2. **Variance-mean analysis** across conditions with different release
+   probability: a parabola fitted with the right weighting, giving N, q and
+   release probability with confidence intervals. It needs at least three
+   conditions and stable responses; check for a trend in amplitude over the
+   sweeps first, and say when the data cannot support it.
+3. **Peak-scaled fluctuation analysis** of accepted spontaneous events (B4):
+   unitary current, and conductance using the driving force (the reversal
+   potential typed in or from B8).
+4. Each states its assumptions and flags when they are broken (trend over
+   time, too few sweeps, poor fit).
+
+**Done when.** On simulated binomial synapses with known N, p and q, and
+simulated channels with a known unitary current, the estimates fall within
+their confidence intervals.
+
+**Your changes.**
+-
+
+## B23. Statistics at the right level
+
+**What it is for.** Summaries and comparisons that respect how the data are
+nested (events in sweeps, sweeps in recordings, recordings in cells, cells in
+animals), so the app never makes an effect look surer than it is.
+
+**The standard.** Pseudoreplication (Aarts et al. 2014, in B12); the
+hierarchical bootstrap (Saravanan, Berman & Sober 2020); estimation with
+uncertainty and the bootstrap (Kass, Eden & Brown 2014); effect sizes with
+confidence intervals (Ho et al. 2019; Cumming 2014); which test for which
+design (Motulsky).
+
+**Requirements.**
+1. **Every table knows its level** (event, sweep, recording, cell, animal),
+   and summaries roll up one level at a time, the rule printed ("mean of each
+   cell's median amplitude").
+2. **Comparisons default to the effect size with its 95% confidence
+   interval,** by bootstrap over cells, or the hierarchical bootstrap over
+   animals then cells (numpy only). n cells and n animals are always shown.
+3. **Standard tests are there for reviewers** (t test, Mann-Whitney, paired
+   t, Wilcoxon, via `scipy.stats`), each labelled with its assumptions and
+   level, with any correction for multiple comparisons stated.
+4. Mixed-effects models need `statsmodels`, a new dependency: ask me first.
+5. **Exclusions are recorded,** with their reason, and shown in figures and
+   exports (flags are evidence).
+6. **A methods paragraph** is generated for each comparison, ready to edit
+   into a paper.
+
+**Done when.** On many simulated nested datasets with no true effect, the
+animal-level comparison is falsely significant about 5% of the time, and the
+app shows how pooling events inflates that rate (a teaching example for the
+manual).
 
 **Your changes.**
 -
@@ -660,6 +1064,10 @@ runs the tests and a self-test inside the frozen app.
 
 # Part C. How to work (always include)
 
+- When remaking the whole app, work in this order: B17 (rename), B18 and
+  B21 (foundations and shared tools), B0 (theme and layout), then the
+  analyses (B1-B10, B20, B22, B23), then B19 (rig mode), B11-B15 and B16.
+  Foundations first, so nothing is built twice.
 - Plan in phases; ask me only what is genuinely my call. Plain language, be
   direct; recommend rather than list options, and argue with me when I'm wrong.
 - Log the work in the vault as it happens: a daily note from
