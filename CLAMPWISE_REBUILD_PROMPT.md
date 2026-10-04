@@ -123,8 +123,6 @@ recorded decision disagree, show me both.
   11:279: non-stationary and peak-scaled fluctuation analysis *(verify)* (B22).
 - Saravanan, Berman & Sober 2020, *Neurons, Behavior, Data analysis, and
   Theory* 3(5): the hierarchical bootstrap for nested data (B23).
-- Rübel et al. 2022, *eLife* 11:e78362: Neurodata Without Borders (NWB), the
-  standard format for sharing neurophysiology data (B18).
 
 ## Who uses it and for what
 
@@ -157,6 +155,10 @@ recorded decision disagree, show me both.
   *less on screen at once*, never *less the app can do*: nothing is removed
   to make a screen cleaner, it is moved behind "Advanced" or into a menu.
   The rules are in B0.
+- **Clampex and WinLTP only.** The app reads Axon `.abf` files from Clampex
+  and WinLTP files, writes Clampex stimulus (`.atf`) and protocol (`.pro`)
+  files, and exports Excel and CSV. Don't add other recording formats (HEKA,
+  Igor, NWB and the like) or build for them; depth on these two comes first.
 - **No new dependencies without asking me.** Current stack: Python 3.12,
   numpy, scipy, pandas, pyabf, pyqtgraph (PyQt5), matplotlib (publication
   figures), openpyxl (Excel). Data downloads go to
@@ -795,10 +797,9 @@ experiments, new recording types and analyses added without rewriting what
 works, and any number traceable back to the file and settings that made it.
 
 **The standard.** The analysis cascade as a fixed pipeline: import,
-preprocess, analyze, summarize, visualize (Nylen & Wallisch 2017). Neurodata
-Without Borders (Rübel et al. 2022) as the shared format for intracellular
-recordings and their metadata, and the FAIR principles it implements
-(findable, accessible, interoperable, reusable).
+preprocess, analyze, summarize, visualize (Nylen & Wallisch 2017). The file
+formats are Clampex's (ABF, as documented by Molecular Devices and read by
+pyabf) and WinLTP's; nothing else (see the scope in Part A).
 
 **Requirements.**
 1. **One data model.** Recording -> sweeps -> channels, each channel with
@@ -806,11 +807,14 @@ recordings and their metadata, and the FAIR principles it implements
    times); the recording with its start time, identity (animal, slice, cell,
    condition) and experiment metadata (age, sex, genotype, internal and
    external solutions, temperature, junction potential, drugs with on and off
-   times). Every reader fills it; analyses read only it, never a file format.
-2. **Readers behind one interface**, so a new format is one new file in
-   `io/`. List the formats the lab might bring (HEKA `.dat`, Igor, AxoGraph,
-   WinWCP) and ask me which to add; reading many formats through `neo` would
-   be a new dependency, so ask.
+   times). The ABF and WinLTP readers fill it; analyses read only it, never
+   a file directly.
+2. **Two formats, read completely.** Clampex ABF (ABF1 and ABF2, episodic
+   and gap-free) and WinLTP files, and nothing else: no general multi-format
+   reader layer, no `neo`. Getting these two right matters more than reading
+   more: test the readers on files from every Clampex protocol the lab uses
+   (current steps, paired pulses, light trains, gap-free, DSI) and on my
+   WinLTP experiments.
 3. **Load lazily.** Headers first, samples only when needed (memory-mapped
    where the format allows); display decimated by min/max so a 60-min file
    scrolls smoothly; memory use for a 60-min, 20 kHz file stays under a
@@ -843,10 +847,15 @@ recordings and their metadata, and the FAIR principles it implements
 10. **Presets** are named, versioned sets of settings for an experiment type
     (my DSI preset, LTP, intrinsic properties, paired pulses), stored in the
     project and printed in exports.
-11. **Share in a standard format.** Export a project to NWB (intracellular
-    recordings with their metadata and results), and import NWB. This needs
-    `pynwb`, a new dependency: ask me first. Until then the tidy CSV with its
-    manifest is the shared format.
+11. **Use everything Clampex records.** The protocol name (to pick the
+    preset and the analyses automatically, saying so), the epoch table and
+    holding level (the stimulus and the steps, before falling back on the
+    command trace, B2), telegraphed gain and clamp mode, the file's start time
+    (B1), and the tags and comments typed during recording (as drug on and off
+    times and notes, B19). For WinLTP, the same for what its files carry
+    (stimulus times, slope and amplitude cursors, the LTP baseline and
+    induction marks). When a file is missing something the analysis needs,
+    say what and ask for it to be typed in.
 12. **Performance budgets checked by tests** in `tools/audit/`: e.g. headers
     of 100 files in under 5 s, scrolling under 0.2 s per frame, an evoked-file
     analysis under 1 s. Propose the numbers from measurements on my files.
@@ -887,7 +896,9 @@ Neher); the quality limits in B10; the passive measurements in B20.
    paired-pulse file.
 5. **Notes while recording:** typed, timestamped notes (cell, location, drug
    on and off, comments) stored in the project and lined up with the files on
-   the cell's clock (B1); drug times feed the plots and the figure builder.
+   the cell's clock (B1); tags and comments typed into Clampex during the
+   recording are read in as notes and drug times too; drug times feed the
+   plots and the figure builder.
 6. **Never gets in Clampex's way:** files opened read-only, partly written
    files tolerated, no file locks.
 
